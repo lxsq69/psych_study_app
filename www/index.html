@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Psychology 101 | Interactive Study Suite</title>
+  
+  <!-- Prevent dark mode flash -->
+  <script>
+    if (localStorage.getItem("psych_theme") === "dark" || 
+        (!localStorage.getItem("psych_theme") && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  </script>
+
+  <!-- Tailwind CSS CDN with darkMode: class -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="h-full flex flex-col font-sans bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 pointer-events-none flex flex-col gap-2 max-w-sm w-full"></div>
+
+  <div class="flex-1 flex overflow-hidden">
+    
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden md:flex md:w-80 lg:w-84 flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-sm flex-shrink-0 z-20 transition-colors">
+      
+      <!-- Brand Logo / Header -->
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20 flex-shrink-0 font-bold text-xl">
+            Ψ
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest block">Study Suite</span>
+            <h1 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">Psychology 101</h1>
+          </div>
+        </div>
+
+        <!-- Theme Toggle Button (Desktop Sidebar) -->
+        <button id="btn-theme-toggle" title="Toggle Dark/Light Mode" class="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <!-- Sun Icon (shown in dark mode) -->
+          <svg class="w-5 h-5 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <!-- Moon Icon (shown in light mode) -->
+          <svg class="w-5 h-5 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Overall Progress Widget -->
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60">
+        <div class="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+          <span>Curriculum Mastery</span>
+          <span id="overall-progress-pct" class="text-indigo-600 dark:text-indigo-400 font-extrabold">0% Complete</span>
+        </div>
+        <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden mb-2.5">
+          <div id="overall-progress-fill" class="progress-fill bg-indigo-600 h-2 rounded-full w-0"></div>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            SRS Mastered:
+          </span>
+          <span id="total-mastered-badge" class="font-bold text-slate-700 dark:text-slate-300">0 / 32 Terms</span>
+        </div>
+      </div>
+
+      <!-- Navigation Module List -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-1" id="sidebar-modules">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Quick Shortcuts / Footer -->
+      <div class="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 text-[11px] text-slate-400 dark:text-slate-500 flex items-center justify-between">
+        <span>Zero-build web app</span>
+        <button id="btn-open-notes-sidebar" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1">
+          <span>📝 Notes</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MOBILE MENU DRAWER & BACKDROP -->
+    <div id="mobile-menu-backdrop" class="hidden fixed inset-0 bg-slate-900/50 sidebar-backdrop z-40 transition-opacity"></div>
+    <div id="mobile-menu" class="hidden fixed inset-y-0 left-0 w-80 bg-white dark:bg-slate-900 shadow-2xl z-50 flex flex-col transition-transform">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold">Ψ</div>
+          <span class="font-bold text-slate-900 dark:text-white">Psychology 101</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button id="btn-theme-toggle-mobile" class="p-2 text-slate-500 dark:text-slate-400 rounded-lg">
+            <svg class="w-5 h-5 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            <svg class="w-5 h-5 block dark:hidden text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+          </button>
+          <button id="btn-close-menu" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3 space-y-1" id="mobile-sidebar-modules">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+
+    <!-- MAIN APP CANVAS -->
+    <main class="flex-1 flex flex-col overflow-y-auto relative bg-slate-50 dark:bg-slate-950 transition-colors">
+      
+      <!-- Top Utility Bar: Search & Pomodoro Focus Timer -->
+      <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+        
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] max-w-md">
+          <!-- Mobile Drawer Toggle -->
+          <button id="btn-open-menu" class="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </button>
+
+          <!-- Search Bar with Instant Dropdown -->
+          <div class="relative flex-1">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </span>
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="Search concepts, psychologists, terms..." 
+              class="w-full pl-9 pr-4 py-1.5 text-xs sm:text-sm bg-slate-100 dark:bg-slate-800 hover:bg-slate-100/90 dark:hover:bg-slate-800/90 focus:bg-white dark:focus:bg-slate-800 border border-transparent focus:border-indigo-500 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950 text-slate-800 dark:text-slate-100 placeholder-slate-400">
+            
+            <!-- Search Results Dropdown -->
+            <div id="search-results" class="hidden absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800 z-50 max-h-80 overflow-y-auto">
+              <!-- Injected via JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 25-Min Pomodoro Focus Timer in Header -->
+        <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 px-3 py-1.5 rounded-xl shadow-xs">
+          <!-- Timer Mode Pill -->
+          <button id="pomo-mode-btn" title="Click to toggle Focus (25m) / Break (5m)" class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-600 text-white transition-all hover:bg-indigo-700">
+            <span id="pomo-mode-label">Focus</span>
+          </button>
+          
+          <!-- Timer Numbers -->
+          <span id="pomo-time-display" class="font-timer text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 tracking-wider">
+            25:00
+          </span>
+
+          <!-- Play / Pause Button -->
+          <button id="pomo-toggle-btn" title="Start / Pause Timer" class="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+            <svg id="pomo-icon-play" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="pomo-icon-pause" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+
+          <!-- Reset Button -->
+          <button id="pomo-reset-btn" title="Reset Timer" class="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+
+          <!-- Audio Chime Test Button -->
+          <button id="pomo-audio-test-btn" title="Test Soft Web Audio Chime" class="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+          </button>
+        </div>
+
+      </header>
+
+      <!-- Module Header Area -->
+      <div class="px-4 sm:px-8 pt-6 sm:pt-8 max-w-5xl w-full mx-auto">
+        <div id="module-header" class="mb-5">
+          <!-- Injected via JS -->
+        </div>
+
+        <!-- Navigation Tabs: Study Guide / Flashcards / Quiz / Case Studies / Media -->
+        <nav id="module-tabs" class="flex gap-4 sm:gap-6 border-b border-slate-200 dark:border-slate-800 overflow-x-auto no-scrollbar">
+          <!-- Injected via JS -->
+        </nav>
+      </div>
+
+      <!-- Main Dynamic Content Container -->
+      <section class="flex-1 px-4 sm:px-8 py-6 sm:py-8 max-w-5xl w-full mx-auto">
+        <div id="tab-content">
+          <!-- Injected via JS -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- PERSISTENT COLLAPSIBLE NOTES SCRATCHPAD -->
+  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end pointer-events-none">
+    
+    <!-- Floating Trigger Pill Button -->
+    <button 
+      id="btn-toggle-scratchpad" 
+      class="pointer-events-auto shadow-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-full flex items-center gap-2 transition-all cursor-pointer">
+      <span class="text-base">📝</span>
+      <span>Study Notes</span>
+      <span id="scratchpad-word-badge" class="bg-indigo-800/80 text-[10px] px-1.5 py-0.5 rounded-full font-semibold">0w</span>
+    </button>
+
+    <!-- Collapsible Scratchpad Panel -->
+    <div 
+      id="scratchpad-panel" 
+      class="scratchpad-panel collapsed pointer-events-auto mt-2 w-[92vw] sm:w-96 max-h-[75vh] flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-all">
+      
+      <!-- Scratchpad Header -->
+      <div class="p-3.5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-sm">📝</span>
+          <div>
+            <h4 class="text-xs font-bold text-slate-900 dark:text-white" id="scratchpad-title">Module Notes</h4>
+            <div class="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="scratchpad-save-status">Auto-saved to localStorage</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <!-- Copy Button -->
+          <button id="btn-copy-notes" title="Copy notes to clipboard" class="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          </button>
+
+          <!-- Export Button -->
+          <button id="btn-export-notes" title="Download as .txt" class="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          </button>
+
+          <!-- Clear Button -->
+          <button id="btn-clear-notes" title="Clear notes" class="p-1.5 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
+
+          <!-- Close / Minimize -->
+          <button id="btn-close-scratchpad" title="Minimize" class="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scratchpad Textarea -->
+      <div class="p-3 flex-1 flex flex-col">
+        <textarea 
+          id="scratchpad-textarea" 
+          placeholder="Capture your thoughts, mnemonics, question notes, and lecture takeaways here... Auto-saves continuously." 
+          class="w-full h-56 sm:h-64 p-3 text-xs sm:text-sm bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none font-mono leading-relaxed"></textarea>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="px-3.5 py-2 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
+        <span id="scratchpad-char-count">0 words &bull; 0 chars</span>
+        <span>Persisted per module</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

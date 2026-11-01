@@ -1,0 +1,177 @@
+/* Custom CSS complementing Tailwind for Psychology 101 Study Suite */
+
+@layer utilities {
+  /* 3D Flashcard Flip Mechanics */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Flashcard custom styling */
+.flashcard-inner {
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+.flashcard-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Dark mode scrollbars */
+html.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Smooth content transitions */
+.fade-in {
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Quiz Option Hover and Selection Feedback */
+.quiz-option {
+  transition: all 0.2s ease;
+}
+
+.quiz-option:hover:not(.disabled) {
+  border-color: #6366f1;
+  background-color: #f8fafc;
+  transform: translateX(4px);
+}
+
+html.dark .quiz-option:hover:not(.disabled) {
+  border-color: #818cf8;
+  background-color: #1e293b;
+}
+
+.quiz-option.selected {
+  border-color: #6366f1;
+  background-color: #eef2ff;
+}
+
+html.dark .quiz-option.selected {
+  border-color: #818cf8;
+  background-color: #312e81;
+}
+
+.quiz-option.correct-choice {
+  border-color: #10b981 !important;
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
+}
+
+html.dark .quiz-option.correct-choice {
+  border-color: #10b981 !important;
+  background-color: #064e3b !important;
+  color: #a7f3d0 !important;
+}
+
+.quiz-option.incorrect-choice {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+  color: #991b1b !important;
+}
+
+html.dark .quiz-option.incorrect-choice {
+  border-color: #ef4444 !important;
+  background-color: #7f1d1d !important;
+  color: #fecaca !important;
+}
+
+/* Analogy Callout Card */
+.analogy-callout {
+  border-left: 4px solid #6366f1;
+  background: linear-gradient(to right, #f5f3ff, #faf5ff);
+}
+
+html.dark .analogy-callout {
+  border-left: 4px solid #818cf8;
+  background: linear-gradient(to right, #1e1b4b, #0f172a);
+}
+
+/* Progress ring / bars */
+.progress-fill {
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mobile Sidebar Backdrop */
+.sidebar-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+/* Pomodoro Digital Display */
+.font-timer {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Notes Scratchpad Slide-Up Drawer Animation */
+.scratchpad-panel {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+
+.scratchpad-panel.collapsed {
+  transform: translateY(110%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Toast alert animation */
+@keyframes slideDownToast {
+  0% { transform: translateY(-100%) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.toast-animate {
+  animation: slideDownToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
