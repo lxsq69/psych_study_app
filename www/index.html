@@ -106,6 +106,22 @@
         <!-- Injected via JavaScript -->
       </div>
 
+      <!-- Quick Interactive Hubs -->
+      <div class="px-3 py-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
+        <button id="sidebar-btn-labs" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-2.5 transition-colors">
+          <span class="text-base">🧪</span>
+          <span>Cognitive Labs & Brain Map</span>
+        </button>
+        <button id="sidebar-btn-speedmatch" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-800 hover:text-purple-600 dark:hover:text-purple-400 flex items-center gap-2.5 transition-colors">
+          <span class="text-base">🎮</span>
+          <span>Speed Match Game</span>
+        </button>
+        <button id="sidebar-btn-mockexam" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2.5 transition-colors">
+          <span class="text-base">📝</span>
+          <span>Comprehensive Mock Exam (40 Qs)</span>
+        </button>
+      </div>
+
       <!-- Quick Shortcuts / Footer -->
       <div class="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 text-[11px] text-slate-400 dark:text-slate-500 flex items-center justify-between">
         <span>Zero-build web app</span>
@@ -135,6 +151,17 @@
       </div>
       <div class="flex-1 overflow-y-auto p-3 space-y-1" id="mobile-sidebar-modules">
         <!-- Injected via JS -->
+      </div>
+      <div class="p-3 border-t border-slate-100 dark:border-slate-800 space-y-1">
+        <button id="mobile-btn-labs" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-2 transition-colors">
+          <span>🧪</span><span>Cognitive Labs & Brain Map</span>
+        </button>
+        <button id="mobile-btn-speedmatch" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-slate-800 hover:text-purple-600 dark:hover:text-purple-400 flex items-center gap-2 transition-colors">
+          <span>🎮</span><span>Speed Match Game</span>
+        </button>
+        <button id="mobile-btn-mockexam" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2 transition-colors">
+          <span>📝</span><span>Mock Final Exam (40 Qs)</span>
+        </button>
       </div>
     </div>
 
@@ -168,33 +195,61 @@
           </div>
         </div>
 
-        <!-- 25-Min Pomodoro Focus Timer in Header -->
-        <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 px-3 py-1.5 rounded-xl shadow-xs">
-          <!-- Timer Mode Pill -->
-          <button id="pomo-mode-btn" title="Click to toggle Focus (25m) / Break (5m)" class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-600 text-white transition-all hover:bg-indigo-700">
-            <span id="pomo-mode-label">Focus</span>
-          </button>
+        <!-- Middle / Right Utilities: Streaks, Quick Launchers, Pomodoro -->
+        <div class="flex items-center flex-wrap gap-2">
           
-          <!-- Timer Numbers -->
-          <span id="pomo-time-display" class="font-timer text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 tracking-wider">
-            25:00
-          </span>
-
-          <!-- Play / Pause Button -->
-          <button id="pomo-toggle-btn" title="Start / Pause Timer" class="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
-            <svg id="pomo-icon-play" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg id="pomo-icon-pause" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          <!-- Daily Streak & Achievements Pill -->
+          <button id="btn-streak-badge" title="Daily Study Streak & Badges" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all shadow-xs cursor-pointer">
+            <span class="animate-bounce">🔥</span>
+            <span id="streak-counter">1 Day Streak</span>
           </button>
 
-          <!-- Reset Button -->
-          <button id="pomo-reset-btn" title="Reset Timer" class="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <!-- Cognitive Labs Button -->
+          <button id="btn-open-labs" title="Interactive Cognitive Experiments & Brain Map" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/80 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer">
+            <span>🧪</span>
+            <span class="hidden sm:inline">Labs</span>
           </button>
 
-          <!-- Audio Chime Test Button -->
-          <button id="pomo-audio-test-btn" title="Test Soft Web Audio Chime" class="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+          <!-- Speed Match Game Button -->
+          <button id="btn-open-speedmatch" title="Speed Match Vocabulary Game" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/80 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-colors cursor-pointer">
+            <span>🎮</span>
+            <span class="hidden sm:inline">Match</span>
           </button>
+
+          <!-- Mock Exam Button -->
+          <button id="btn-open-mockexam" title="Comprehensive 40-Question Mock Exam" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors cursor-pointer">
+            <span>📝</span>
+            <span class="hidden sm:inline">Exam</span>
+          </button>
+
+          <!-- 25-Min Pomodoro Focus Timer in Header -->
+          <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 px-2.5 py-1.5 rounded-xl shadow-xs">
+            <!-- Timer Mode Pill -->
+            <button id="pomo-mode-btn" title="Click to toggle Focus (25m) / Break (5m)" class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-600 text-white transition-all hover:bg-indigo-700">
+              <span id="pomo-mode-label">Focus</span>
+            </button>
+            
+            <!-- Timer Numbers -->
+            <span id="pomo-time-display" class="font-timer text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 tracking-wider">
+              25:00
+            </span>
+
+            <!-- Play / Pause Button -->
+            <button id="pomo-toggle-btn" title="Start / Pause Timer" class="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+              <svg id="pomo-icon-play" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="pomo-icon-pause" class="w-3.5 h-3.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+
+            <!-- Reset Button -->
+            <button id="pomo-reset-btn" title="Reset Timer" class="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+
+            <!-- Audio Chime Test Button -->
+            <button id="pomo-audio-test-btn" title="Test Soft Web Audio Chime" class="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+            </button>
+          </div>
         </div>
 
       </header>
@@ -221,17 +276,32 @@
     </main>
   </div>
 
-  <!-- PERSISTENT COLLAPSIBLE NOTES SCRATCHPAD -->
-  <div class="fixed bottom-5 right-5 z-40 flex flex-col items-end pointer-events-none">
+  <!-- MOVABLE DRAGGABLE PERSISTENT NOTES SCRATCHPAD -->
+  <div id="floating-notes-container" class="fixed z-40 flex flex-col items-end pointer-events-none" style="bottom: 20px; right: 20px;">
     
-    <!-- Floating Trigger Pill Button -->
-    <button 
-      id="btn-toggle-scratchpad" 
-      class="pointer-events-auto shadow-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs sm:text-sm px-4 py-2.5 rounded-full flex items-center gap-2 transition-all cursor-pointer">
-      <span class="text-base">📝</span>
-      <span>Study Notes</span>
-      <span id="scratchpad-word-badge" class="bg-indigo-800/80 text-[10px] px-1.5 py-0.5 rounded-full font-semibold">0w</span>
-    </button>
+    <!-- Floating Trigger Pill Button (Draggable via handle or body) -->
+    <div id="notes-pill-wrapper" class="pointer-events-auto flex items-stretch bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-full shadow-2xl transition-all select-none border border-indigo-400/30 group">
+      <!-- Drag Handle Grip -->
+      <button 
+        id="notes-drag-handle" 
+        title="Drag to reposition notes anywhere on screen" 
+        class="drag-handle px-3 py-2 text-indigo-200 hover:text-white transition-colors cursor-grab flex items-center justify-center border-r border-indigo-500/40">
+        <svg class="w-4 h-4 opacity-80 group-hover:opacity-100" fill="currentColor" viewBox="0 0 24 24">
+          <circle cx="8" cy="6" r="1.5"/><circle cx="16" cy="6" r="1.5"/>
+          <circle cx="8" cy="12" r="1.5"/><circle cx="16" cy="12" r="1.5"/>
+          <circle cx="8" cy="18" r="1.5"/><circle cx="16" cy="18" r="1.5"/>
+        </svg>
+      </button>
+
+      <!-- Click to Toggle Notes -->
+      <button 
+        id="btn-toggle-scratchpad" 
+        class="font-bold text-xs sm:text-sm pl-2.5 pr-4 py-2.5 flex items-center gap-2 cursor-pointer">
+        <span class="text-base">📝</span>
+        <span>Study Notes</span>
+        <span id="scratchpad-word-badge" class="bg-indigo-900/90 text-[10px] px-1.5 py-0.5 rounded-full font-semibold">0w</span>
+      </button>
+    </div>
 
     <!-- Collapsible Scratchpad Panel -->
     <div 
@@ -239,7 +309,7 @@
       class="scratchpad-panel collapsed pointer-events-auto mt-2 w-[92vw] sm:w-96 max-h-[75vh] flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-all">
       
       <!-- Scratchpad Header -->
-      <div class="p-3.5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+      <div class="p-3 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="text-sm">📝</span>
           <div>
@@ -252,6 +322,11 @@
         </div>
 
         <div class="flex items-center gap-1">
+          <!-- Reset Position Button -->
+          <button id="btn-reset-notes-pos" title="Dock back to bottom-right corner" class="p-1.5 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          </button>
+
           <!-- Copy Button -->
           <button id="btn-copy-notes" title="Copy notes to clipboard" class="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
@@ -288,6 +363,118 @@
         <span>Persisted per module</span>
       </div>
 
+    </div>
+  </div>
+
+  <!-- MODAL: COGNITIVE LABS & BRAIN MAP -->
+  <div id="modal-labs" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-sm">
+    <div class="modal-enter bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-800/40">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-500/20">🧪</div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">Interactive Cognitive Psychology Labs</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Empirical experiments & anatomical brain sandbox</p>
+          </div>
+        </div>
+        <button id="modal-labs-close" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Labs Navigation Tabs -->
+      <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900 px-4 sm:px-6 gap-2 sm:gap-4 overflow-x-auto no-scrollbar">
+        <button id="lab-tab-stroop" class="lab-tab active py-3 px-3 border-b-2 border-indigo-600 font-bold text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 whitespace-nowrap cursor-pointer">
+          ⚡ Stroop Effect
+        </button>
+        <button id="lab-tab-digitspan" class="lab-tab py-3 px-3 border-b-2 border-transparent font-medium text-xs sm:text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white whitespace-nowrap cursor-pointer">
+          🗃️ Digit-Span Memory
+        </button>
+        <button id="lab-tab-perception" class="lab-tab py-3 px-3 border-b-2 border-transparent font-medium text-xs sm:text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white whitespace-nowrap cursor-pointer">
+          👁️ Perception Sandbox
+        </button>
+        <button id="lab-tab-brain" class="lab-tab py-3 px-3 border-b-2 border-transparent font-medium text-xs sm:text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white whitespace-nowrap cursor-pointer">
+          🧠 Interactive Brain Map
+        </button>
+      </div>
+
+      <!-- Lab Dynamic Content Area -->
+      <div id="lab-tab-content" class="flex-1 overflow-y-auto p-4 sm:p-6">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SPEED MATCH VOCABULARY GAME -->
+  <div id="modal-speedmatch" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-sm">
+    <div class="modal-enter bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-800/40">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-purple-500/20">🎮</div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">Speed Match Vocabulary Game</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Match psychological terms to their definitions before time expires!</p>
+          </div>
+        </div>
+        <button id="modal-speedmatch-close" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Speed Match Body -->
+      <div id="speedmatch-body" class="flex-1 overflow-y-auto p-4 sm:p-6">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: COMPREHENSIVE MOCK FINAL EXAM (40 Qs) -->
+  <div id="modal-mockexam" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-sm">
+    <div class="modal-enter bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[94vh] flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-800/40">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-emerald-500/20">📝</div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">Psychology 101 Mock Final Exam</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">40 comprehensive questions spanning all 8 core curriculum domains</p>
+          </div>
+        </div>
+        <button id="modal-mockexam-close" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Mock Exam Body -->
+      <div id="mockexam-body" class="flex-1 overflow-y-auto p-4 sm:p-6">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: STREAKS & ACHIEVEMENTS -->
+  <div id="modal-streaks" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-sm">
+    <div class="modal-enter bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+      <!-- Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-800/40">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-amber-500/20">🔥</div>
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">Study Streaks & Achievements</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Consistency and curriculum milestones</p>
+          </div>
+        </div>
+        <button id="modal-streaks-close" class="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Streaks Body -->
+      <div id="streaks-body" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
+        <!-- Injected via JavaScript -->
+      </div>
     </div>
   </div>
 

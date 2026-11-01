@@ -175,3 +175,105 @@ html.dark .analogy-callout {
 .toast-animate {
   animation: slideDownToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Draggable Floating Notes Widget */
+#floating-notes-container {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.05s linear, box-shadow 0.2s ease;
+  will-change: transform, left, top;
+}
+
+#floating-notes-container.is-dragging {
+  cursor: grabbing !important;
+  opacity: 0.95;
+  transform: scale(1.03);
+  box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.4);
+}
+
+.drag-handle {
+  cursor: grab;
+}
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Speed Match Tile Game Animations */
+@keyframes tileShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.tile-shake {
+  animation: tileShake 0.4s ease-in-out;
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
+
+html.dark .tile-shake {
+  border-color: #ef4444 !important;
+  background-color: #450a0a !important;
+}
+
+@keyframes popMatch {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); filter: brightness(1.2); }
+  100% { transform: scale(0.95); opacity: 0.35; pointer-events: none; }
+}
+
+.tile-matched {
+  animation: popMatch 0.5s ease-out forwards;
+  border-color: #10b981 !important;
+  background-color: #ecfdf5 !important;
+}
+
+html.dark .tile-matched {
+  border-color: #10b981 !important;
+  background-color: #064e3b !important;
+}
+
+/* Modal Animations */
+.modal-enter {
+  animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Interactive SVG Brain Regions */
+.brain-lobe {
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.brain-lobe:hover {
+  filter: brightness(1.25) drop-shadow(0 0 8px rgba(99, 102, 241, 0.6));
+  stroke-width: 3px;
+}
+
+.brain-lobe.active-lobe {
+  stroke-width: 3.5px;
+  stroke: #ffffff;
+  filter: brightness(1.35) drop-shadow(0 0 12px rgba(99, 102, 241, 0.9));
+}
+
+/* Speaking Audio Pulse Indicator */
+@keyframes audioPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+.audio-pulse {
+  animation: audioPulse 1.2s infinite ease-in-out;
+}
+
