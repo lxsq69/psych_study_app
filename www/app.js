@@ -46,6 +46,10 @@
     // { [cardId]: { ease: 'hard'|'good'|'easy', reviewCount: 1, lastReviewed: ts, nextReviewDate: ts, intervalDays: 3 } }
     srsCards: JSON.parse(localStorage.getItem("psych_srs_state") || "{}"),
 
+    // Guided 5-Step Learning Roadmap state per module
+    // { [moduleId]: { guide: bool, video: bool, flashcards: bool, caseStudy: bool, quiz: bool } }
+    moduleSteps: JSON.parse(localStorage.getItem("psych_module_steps") || "{}"),
+
     // User progress stored locally
     userProgress: {
       completedQuizzes: JSON.parse(localStorage.getItem("psych_completed_quizzes") || "{}"),
@@ -125,6 +129,7 @@
     localStorage.setItem("psych_srs_state", JSON.stringify(state.srsCards));
     localStorage.setItem("psych_casestudy_answers", JSON.stringify(state.caseStudyAnswers));
     localStorage.setItem("psych_completed_quizzes", JSON.stringify(state.userProgress.completedQuizzes));
+    localStorage.setItem("psych_module_steps", JSON.stringify(state.moduleSteps));
     updateStatsBadges();
   }
 
@@ -210,7 +215,26 @@
 
     modalStreaks: document.getElementById("modal-streaks"),
     modalStreaksClose: document.getElementById("modal-streaks-close"),
-    streaksBody: document.getElementById("streaks-body")
+    streaksBody: document.getElementById("streaks-body"),
+
+    // Guided Learning Path & Stepper Elements
+    moduleStepper: document.getElementById("module-stepper"),
+    sidebarNextUpContainer: document.getElementById("sidebar-next-up-container"),
+    sidebarNextUpTitle: document.getElementById("sidebar-next-up-title"),
+    sidebarNextUpDesc: document.getElementById("sidebar-next-up-desc"),
+    sidebarBtnResume: document.getElementById("sidebar-btn-resume"),
+    sidebarBtnResumeLabel: document.getElementById("sidebar-btn-resume-label"),
+    mobileNextUpContainer: document.getElementById("mobile-next-up-container"),
+    mobileNextUpTitle: document.getElementById("mobile-next-up-title"),
+    mobileNextUpDesc: document.getElementById("mobile-next-up-desc"),
+    mobileBtnResume: document.getElementById("mobile-btn-resume"),
+    mobileBtnResumeLabel: document.getElementById("mobile-btn-resume-label"),
+    btnOpenGuide: document.getElementById("btn-open-guide"),
+    mobileBtnGuide: document.getElementById("mobile-btn-guide"),
+    modalGuide: document.getElementById("modal-guide"),
+    modalGuideClose: document.getElementById("modal-guide-close"),
+    modalGuideAction: document.getElementById("modal-guide-action"),
+    modalGuideActionLabel: document.getElementById("modal-guide-action-label")
   };
 
   // Initialize App
@@ -226,6 +250,7 @@
     renderCurrentView();
     setupEventListeners();
     updateStatsBadges();
+    updateSidebarNextUpCard();
   }
 
   // Toast Notification System
@@ -2159,6 +2184,26 @@
     DOM.btnStreakBadge?.addEventListener("click", openStreaksHandler);
     DOM.modalStreaksClose?.addEventListener("click", () => DOM.modalStreaks?.classList.add("hidden"));
 
+    // Learning Roadmap Guide
+    const openGuideHandler = () => openLearningGuideModal();
+    DOM.btnOpenGuide?.addEventListener("click", openGuideHandler);
+    DOM.mobileBtnGuide?.addEventListener("click", () => {
+      closeMobileMenu();
+      openGuideHandler();
+    });
+    DOM.modalGuideClose?.addEventListener("click", () => DOM.modalGuide?.classList.add("hidden"));
+    DOM.modalGuideAction?.addEventListener("click", () => {
+      DOM.modalGuide?.classList.add("hidden");
+      resumeNextRecommendedStep();
+    });
+
+    // Next Up Resume Button in Sidebar & Mobile Drawer
+    DOM.sidebarBtnResume?.addEventListener("click", resumeNextRecommendedStep);
+    DOM.mobileBtnResume?.addEventListener("click", () => {
+      closeMobileMenu();
+      resumeNextRecommendedStep();
+    });
+
     initCognitiveLabs();
     initMockExam();
   }
@@ -2192,6 +2237,255 @@
     if (DOM.overallProgressPct) {
       DOM.overallProgressPct.textContent = `${pct}% Complete`;
     }
+    updateSidebarNextUpCard();
+  }
+
+  // ==========================================
+  // GUIDED COGNITIVE LEARNING ROADMAP SYSTEM
+  // ==========================================
+
+  function getModuleStepState(modId) {
+    if (!state.moduleSteps[modId]) {
+      state.moduleSteps[modId] = {
+        guide: false,
+        video: false,
+        flashcards: false,
+        caseStudy: false,
+        quiz: false
+      };
+    }
+    const ms = state.moduleSteps[modId];
+    if (state.userProgress.completedQuizzes[modId] >= 3) {
+      ms.quiz = true;
+    }
+    const mod = PSYCH_DATA.modules.find(m => m.id === modId);
+    if (mod) {
+      if (mod.caseStudies && mod.caseStudies.some(cs => state.caseStudyAnswers[cs.id] !== undefined)) {
+        ms.caseStudy = true;
+      }
+      if (mod.flashcards && mod.flashcards.some(fc => state.srsCards[fc.id])) {
+        ms.flashcards = true;
+      }
+    }
+    return ms;
+  }
+
+  function setModuleStepComplete(modId, stepKey) {
+    const s = getModuleStepState(modId);
+    if (!s[stepKey]) {
+      s[stepKey] = true;
+      localStorage.setItem("psych_module_steps", JSON.stringify(state.moduleSteps));
+      renderModuleStepper();
+      updateSidebarNextUpCard();
+    }
+  }
+
+  function getRecommendedStepForModule(modId) {
+    const s = getModuleStepState(modId);
+    if (!s.guide) return "guide";
+    if (!s.video) return "video";
+    if (!s.flashcards) return "flashcards";
+    if (!s.caseStudy) return "caseStudy";
+    if (!s.quiz) return "quiz";
+    return "done";
+  }
+
+  function getGlobalNextRecommendation() {
+    for (let i = 0; i < PSYCH_DATA.modules.length; i++) {
+      const mod = PSYCH_DATA.modules[i];
+      const s = getModuleStepState(mod.id);
+      if (!s.guide) {
+        return {
+          moduleId: mod.id,
+          tab: "study",
+          stepName: "Read Guide",
+          title: `Module ${mod.number}: Read Study Guide`,
+          desc: `Build core mental schema for ${mod.title}.`,
+          isExam: false
+        };
+      }
+      if (!s.video) {
+        return {
+          moduleId: mod.id,
+          tab: "resources",
+          stepName: "Watch Media",
+          title: `Module ${mod.number}: Watch Video Lecture`,
+          desc: `Dual-coding visual crash course for ${mod.title}.`,
+          isExam: false
+        };
+      }
+      if (!s.flashcards) {
+        return {
+          moduleId: mod.id,
+          tab: "flashcards",
+          stepName: "Active Recall",
+          title: `Module ${mod.number}: Active Recall Cards`,
+          desc: `Test memory before flipping cards for ${mod.title}.`,
+          isExam: false
+        };
+      }
+      if (!s.caseStudy) {
+        return {
+          moduleId: mod.id,
+          tab: "case-study",
+          stepName: "Case Study",
+          title: `Module ${mod.number}: Clinical Dilemma`,
+          desc: `Solve the behavioral case study for ${mod.title}.`,
+          isExam: false
+        };
+      }
+      if (!s.quiz) {
+        return {
+          moduleId: mod.id,
+          tab: "quiz",
+          stepName: "Practice Quiz",
+          title: `Module ${mod.number}: Practice Quiz`,
+          desc: `Test mastery on 5 questions for ${mod.title}.`,
+          isExam: false
+        };
+      }
+    }
+    return {
+      moduleId: "intro-history",
+      tab: "mockexam",
+      stepName: "Mock Final Exam",
+      title: "Comprehensive Mock Final Exam",
+      desc: "All 8 modules mastered! Test yourself with 40 AP/college questions.",
+      isExam: true
+    };
+  }
+
+  function resumeNextRecommendedStep() {
+    const rec = getGlobalNextRecommendation();
+    if (rec.isExam) {
+      openMockExam();
+    } else {
+      if (state.currentModuleId !== rec.moduleId) {
+        switchModule(rec.moduleId);
+      }
+      switchTab(rec.tab);
+    }
+  }
+
+  function updateSidebarNextUpCard() {
+    const rec = getGlobalNextRecommendation();
+    if (DOM.sidebarNextUpTitle) {
+      DOM.sidebarNextUpTitle.textContent = rec.title;
+    }
+    if (DOM.sidebarNextUpDesc) {
+      DOM.sidebarNextUpDesc.textContent = rec.desc;
+    }
+    if (DOM.sidebarBtnResumeLabel) {
+      DOM.sidebarBtnResumeLabel.textContent = rec.isExam ? "Take Final Exam" : "Continue Learning";
+    }
+
+    if (DOM.mobileNextUpTitle) {
+      DOM.mobileNextUpTitle.textContent = rec.title;
+    }
+    if (DOM.mobileNextUpDesc) {
+      DOM.mobileNextUpDesc.textContent = rec.desc;
+    }
+    if (DOM.mobileBtnResumeLabel) {
+      DOM.mobileBtnResumeLabel.textContent = rec.isExam ? "Take Final Exam" : "Continue Learning";
+    }
+  }
+
+  function renderModuleStepper() {
+    if (!DOM.moduleStepper) return;
+    const mod = getCurrentModule();
+    const s = getModuleStepState(mod.id);
+    const recommended = getRecommendedStepForModule(mod.id);
+
+    const steps = [
+      { key: "guide", tab: "study", num: "1", icon: "📖", title: "Read Guide", short: "Guide" },
+      { key: "video", tab: "resources", num: "2", icon: "🎬", title: "Watch Video", short: "Video" },
+      { key: "flashcards", tab: "flashcards", num: "3", icon: "🎴", title: "Active Recall", short: "Recall" },
+      { key: "caseStudy", tab: "case-study", num: "4", icon: "🧩", title: "Case Study", short: "Case" },
+      { key: "quiz", tab: "quiz", num: "5", icon: "✍️", title: "Practice Quiz", short: "Quiz" }
+    ];
+
+    let completedCount = 0;
+    steps.forEach(st => {
+      if (s[st.key]) completedCount++;
+    });
+    const pct = Math.round((completedCount / steps.length) * 100);
+
+    let html = `
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 sm:p-4 shadow-xs">
+        <div class="flex items-center justify-between gap-2 mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+              <span>🧭</span>
+              <span>5-Step Cognitive Loop</span>
+            </span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${completedCount === 5 ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}">
+              ${completedCount}/5 Complete (${pct}%)
+            </span>
+          </div>
+          <button id="btn-why-order" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold flex items-center gap-1 cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Study Method</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+    `;
+
+    steps.forEach(st => {
+      const isDone = s[st.key];
+      const isCurrentTab = state.currentTab === st.tab;
+      const isRec = recommended === st.key;
+
+      let styleClasses = "border ";
+      if (isCurrentTab) {
+        styleClasses += "ring-2 ring-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/40 border-indigo-500 text-indigo-900 dark:text-indigo-200 font-bold ";
+      } else if (isRec && !isDone) {
+        styleClasses += "step-active-pulse border-indigo-400 dark:border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold ";
+      } else if (isDone) {
+        styleClasses += "border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-800 dark:text-emerald-300 font-semibold ";
+      } else {
+        styleClasses += "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 ";
+      }
+
+      html += `
+        <button data-stepper-tab="${st.tab}" class="${styleClasses} p-2 rounded-xl text-left transition-all flex items-center justify-between gap-1 cursor-pointer select-none">
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 text-xs">
+              <span class="text-sm">${st.icon}</span>
+              <span class="truncate font-bold">${st.num}. ${st.short}</span>
+            </div>
+          </div>
+          <div class="flex-shrink-0">
+            ${isDone 
+              ? '<span class="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">✓</span>' 
+              : isRec 
+                ? '<span class="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-indigo-600 text-white animate-pulse">Next</span>' 
+                : '<span class="w-3 h-3 rounded-full border border-slate-300 dark:border-slate-700 block"></span>'
+            }
+          </div>
+        </button>
+      `;
+    });
+
+    html += `
+        </div>
+      </div>
+    `;
+
+    DOM.moduleStepper.innerHTML = html;
+
+    DOM.moduleStepper.querySelectorAll("[data-stepper-tab]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tabKey = btn.getAttribute("data-stepper-tab");
+        switchTab(tabKey);
+      });
+    });
+
+    document.getElementById("btn-why-order")?.addEventListener("click", openLearningGuideModal);
+  }
+
+  function openLearningGuideModal() {
+    DOM.modalGuide?.classList.remove("hidden");
   }
 
   // Render Sidebar Navigation
@@ -2263,7 +2557,9 @@
       state.flashcard.isFlipped = false;
     }
     renderHeaderAndTabs();
+    renderModuleStepper();
     renderTabContent();
+    updateSidebarNextUpCard();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -2300,7 +2596,9 @@
   // Main Render Controller
   function renderCurrentView() {
     renderHeaderAndTabs();
+    renderModuleStepper();
     renderTabContent();
+    updateSidebarNextUpCard();
   }
 
   // Render Header & Tab Navigation
@@ -2401,6 +2699,7 @@
 
   // 1. Study Guide View
   function renderStudyGuideView(mod) {
+    setModuleStepComplete(mod.id, "guide");
     const container = document.createElement("div");
     container.className = "space-y-8";
 
@@ -2517,20 +2816,22 @@
     unlockAchievement("curious_mind");
 
     const bottomNav = document.createElement("div");
-    bottomNav.className = "flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm";
+    bottomNav.className = "flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-200 dark:border-indigo-900/60 rounded-2xl shadow-sm";
     bottomNav.innerHTML = `
       <div>
-        <h4 class="font-bold text-slate-900 dark:text-white text-base">Finished reading this module?</h4>
-        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Lock in concepts with Spaced Repetition flashcards, solve the Case Study, or play Speed Match.</p>
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Step 1 Complete</span>
+          <span>&bull;</span>
+          <span>Next: Curated Media (Step 2)</span>
+        </div>
+        <h4 class="font-extrabold text-slate-900 dark:text-white text-base mt-1">Ready to solidify what you just read?</h4>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Watch the curated CrashCourse episode to encode visual and auditory memories (Dual-Coding Theory).</p>
       </div>
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <button id="btn-goto-flashcards" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer">
-          <span>Review Flashcards</span>
+      <div class="flex items-center gap-2.5 w-full sm:w-auto">
+        <button id="btn-goto-media" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>Next: Watch Media (Step 2)</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-        </button>
-        <button id="btn-goto-speedmatch" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
-          <span>Speed Match</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
         </button>
       </div>
     `;
@@ -2538,8 +2839,7 @@
     container.appendChild(bottomNav);
     DOM.tabContent.appendChild(container);
 
-    document.getElementById("btn-goto-flashcards")?.addEventListener("click", () => switchTab("flashcards"));
-    document.getElementById("btn-goto-speedmatch")?.addEventListener("click", () => openSpeedMatch(mod.id));
+    document.getElementById("btn-goto-media")?.addEventListener("click", () => switchTab("resources"));
   }
 
   // 2. Upgraded Flashcards View
@@ -2849,6 +3149,7 @@
           intervalDays: days
         };
         persistSRS();
+        setModuleStepComplete(mod.id, "flashcards");
         if (state.flashcard.index < cards.length - 1) {
           state.flashcard.index++;
         }
@@ -2860,7 +3161,32 @@
       document.getElementById("recall-btn-nailed")?.addEventListener("click", () => scheduleSRS("easy", 7));
     }
 
+    // Step 3 -> Next Step recommendation: Step 4 Case Study
+    const bottomNav = document.createElement("div");
+    bottomNav.className = "flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-orange-500/10 border border-amber-200 dark:border-rose-900/60 rounded-2xl shadow-sm mt-8";
+    bottomNav.innerHTML = `
+      <div>
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Step 3 &bull; Active Recall</span>
+          <span>&bull;</span>
+          <span>Next: Clinical Case Study (Step 4)</span>
+        </div>
+        <h4 class="font-extrabold text-slate-900 dark:text-white text-base mt-1">Ready to apply these concepts?</h4>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Solve realistic human dilemmas and see how theoretical principles apply to behavior.</p>
+      </div>
+      <div class="flex items-center gap-2.5 w-full sm:w-auto">
+        <button id="btn-goto-casestudy-from-fc" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>Next: Case Study (Step 4)</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    `;
+    wrapper.appendChild(bottomNav);
+
     DOM.tabContent.appendChild(wrapper);
+
+    document.getElementById("btn-goto-casestudy-from-fc")?.addEventListener("click", () => switchTab("case-study"));
 
     document.getElementById("btn-listen-card")?.addEventListener("click", function () {
       speakText(`${currentCard.term}. ${currentCard.definition}. For example: ${currentCard.example || ''}`, this);
@@ -2877,6 +3203,7 @@
         intervalDays: days
       };
       persistSRS();
+      setModuleStepComplete(mod.id, "flashcards");
       if (ease === "hard") {
         state.flashcard.shuffledCards.push({ ...currentCard });
       }
@@ -3085,7 +3412,32 @@
     `;
     container.appendChild(breakdownCard);
 
+    // Step 4 -> Next Step recommendation: Step 5 Practice Quiz
+    const bottomNav = document.createElement("div");
+    bottomNav.className = "flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-gradient-to-r from-rose-500/10 via-emerald-500/10 to-teal-500/10 border border-rose-200 dark:border-emerald-900/60 rounded-2xl shadow-sm";
+    bottomNav.innerHTML = `
+      <div>
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Step 4 &bull; Clinical Case Study</span>
+          <span>&bull;</span>
+          <span>Final Step: Practice Quiz</span>
+        </div>
+        <h4 class="font-extrabold text-slate-900 dark:text-white text-base mt-1">Ready to prove your comprehension?</h4>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Take the 5-question module quiz to earn your verified mastery badge.</p>
+      </div>
+      <div class="flex items-center gap-2.5 w-full sm:w-auto">
+        <button id="btn-goto-quiz-from-cs" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>Next: Practice Quiz (Step 5)</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    `;
+    container.appendChild(bottomNav);
+
     DOM.tabContent.appendChild(container);
+
+    document.getElementById("btn-goto-quiz-from-cs")?.addEventListener("click", () => switchTab("quiz"));
 
     if (!isAnswered) {
       questionCard.querySelectorAll("[data-cs-oidx]").forEach(btn => {
@@ -3094,6 +3446,7 @@
           state.caseStudyAnswers[cs.id] = idx;
           state.caseStudyRevealed[cs.id] = true;
           persistSRS();
+          setModuleStepComplete(mod.id, "caseStudy");
           renderCaseStudyView(mod);
           if (cs.options[idx].correct) {
             playSoftChime(880, 0.8);
@@ -3107,6 +3460,7 @@
 
     document.getElementById("btn-toggle-breakdown")?.addEventListener("click", () => {
       state.caseStudyRevealed[cs.id] = !state.caseStudyRevealed[cs.id];
+      setModuleStepComplete(mod.id, "caseStudy");
       renderCaseStudyView(mod);
     });
   }
@@ -3250,6 +3604,78 @@
         </button>
       `;
       container.appendChild(submitBox);
+    } else {
+      const curModIdx = PSYCH_DATA.modules.findIndex(m => m.id === mod.id);
+      const nextMod = curModIdx >= 0 && curModIdx < PSYCH_DATA.modules.length - 1 ? PSYCH_DATA.modules[curModIdx + 1] : null;
+      const passed = state.quiz.score >= 3;
+
+      const completionCard = document.createElement("div");
+      completionCard.className = `p-6 rounded-2xl border shadow-sm transition-all flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 ${
+        passed 
+          ? "bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-indigo-500/10 border-emerald-300 dark:border-emerald-800" 
+          : "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800"
+      }`;
+
+      if (passed) {
+        if (nextMod) {
+          completionCard.innerHTML = `
+            <div>
+              <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                <span>🎉 Module ${mod.number} Mastered!</span>
+                <span>&bull;</span>
+                <span>Ready for Next Module</span>
+              </div>
+              <h4 class="font-extrabold text-slate-900 dark:text-white text-base mt-1">Next: Module ${nextMod.number} - ${nextMod.title}</h4>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">${nextMod.tagline}</p>
+            </div>
+            <div class="flex items-center gap-2.5 w-full sm:w-auto">
+              <button id="btn-advance-next-module" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span>Advance to Module ${nextMod.number}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </button>
+            </div>
+          `;
+        } else {
+          // Module 8 capstone!
+          completionCard.innerHTML = `
+            <div>
+              <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                <span>🎓 Curriculum Complete!</span>
+                <span>&bull;</span>
+                <span>All 8 Modules Mastered</span>
+              </div>
+              <h4 class="font-extrabold text-slate-900 dark:text-white text-base mt-1">Ready for the 40-Question Mock Final Exam?</h4>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Test your comprehensive knowledge across all 8 modules in a timed 30-minute simulation.</p>
+            </div>
+            <div class="flex items-center gap-2.5 w-full sm:w-auto">
+              <button id="btn-advance-mockexam" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <span>Launch Mock Final Exam</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              </button>
+            </div>
+          `;
+        }
+      } else {
+        completionCard.innerHTML = `
+          <div>
+            <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              <span>Need 3+ to Pass</span>
+              <span>&bull;</span>
+              <span>Keep Practicing</span>
+            </div>
+            <h4 class="font-extrabold text-slate-900 dark:text-white text-base mt-1">Review Active Recall Cards before moving on</h4>
+            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Targeted flashcard practice will reinforce the specific facts you missed.</p>
+          </div>
+          <div class="flex items-center gap-2.5 w-full sm:w-auto">
+            <button id="btn-review-cards-retry" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>Review Cards</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+          </div>
+        `;
+      }
+
+      container.appendChild(completionCard);
     }
 
     DOM.tabContent.appendChild(container);
@@ -3278,6 +3704,7 @@
         if (score >= prev) {
           state.userProgress.completedQuizzes[mod.id] = score;
         }
+        setModuleStepComplete(mod.id, "quiz");
         persistSRS();
         renderSidebar();
         renderQuizView(mod);
@@ -3287,6 +3714,19 @@
         }
       });
     } else {
+      const curModIdx = PSYCH_DATA.modules.findIndex(m => m.id === mod.id);
+      const nextMod = curModIdx >= 0 && curModIdx < PSYCH_DATA.modules.length - 1 ? PSYCH_DATA.modules[curModIdx + 1] : null;
+
+      document.getElementById("btn-advance-next-module")?.addEventListener("click", () => {
+        if (nextMod) switchModule(nextMod.id);
+      });
+      document.getElementById("btn-advance-mockexam")?.addEventListener("click", () => {
+        openMockExam();
+      });
+      document.getElementById("btn-review-cards-retry")?.addEventListener("click", () => {
+        switchTab("flashcards");
+      });
+
       document.getElementById("btn-retake-quiz")?.addEventListener("click", () => {
         state.quiz.answers = {};
         state.quiz.submitted = false;
@@ -3299,6 +3739,7 @@
 
   // 5. Curated Media View
   function renderResourcesView(mod) {
+    setModuleStepComplete(mod.id, "video");
     const container = document.createElement("div");
     container.className = "space-y-6 max-w-3xl mx-auto";
 
@@ -3358,7 +3799,32 @@
     `;
     container.appendChild(tipsCard);
 
+    // Step 2 -> Next Step recommendation: Step 3 Active Recall Flashcards
+    const bottomNav = document.createElement("div");
+    bottomNav.className = "flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10 border border-purple-200 dark:border-indigo-900/60 rounded-2xl shadow-sm";
+    bottomNav.innerHTML = `
+      <div>
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>Step 2 Complete</span>
+          <span>&bull;</span>
+          <span>Next: Active Recall Flashcards (Step 3)</span>
+        </div>
+        <h4 class="font-extrabold text-slate-900 dark:text-white text-base mt-1">Ready for Active Retrieval?</h4>
+        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Retrieval effort strengthens neural pathways far more than passive re-watching.</p>
+      </div>
+      <div class="flex items-center gap-2.5 w-full sm:w-auto">
+        <button id="btn-goto-flashcards-from-media" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+          <span>Next: Practice Cards (Step 3)</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    `;
+    container.appendChild(bottomNav);
+
     DOM.tabContent.appendChild(container);
+
+    document.getElementById("btn-goto-flashcards-from-media")?.addEventListener("click", () => switchTab("flashcards"));
   }
 
   // Global Quick Search Feature
