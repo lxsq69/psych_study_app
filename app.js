@@ -184,6 +184,9 @@
     btnCloseScratchpad: document.getElementById("btn-close-scratchpad"),
 
     // Hub Quick Actions & Modals
+    btnOpenDeepTutor: document.getElementById("btn-open-deeptutor"),
+    sidebarBtnDeepTutor: document.getElementById("sidebar-btn-deeptutor"),
+    mobileBtnDeepTutor: document.getElementById("mobile-btn-deeptutor"),
     btnStreakBadge: document.getElementById("btn-streak-badge"),
     streakCounter: document.getElementById("streak-counter"),
     btnOpenLabs: document.getElementById("btn-open-labs"),
@@ -2146,6 +2149,19 @@
 
   // 10. Hub Modals Wireup
   function initHubModals() {
+    // DeepTutor Socratic AI
+    const openDeepTutorHandler = () => {
+      if (typeof DeepTutor !== "undefined" && DeepTutor.openGlobalModal) {
+        DeepTutor.openGlobalModal(state.currentModuleId);
+      }
+    };
+    DOM.btnOpenDeepTutor?.addEventListener("click", openDeepTutorHandler);
+    DOM.sidebarBtnDeepTutor?.addEventListener("click", openDeepTutorHandler);
+    DOM.mobileBtnDeepTutor?.addEventListener("click", () => {
+      closeMobileMenu();
+      openDeepTutorHandler();
+    });
+
     // Cognitive Labs
     const openLabsHandler = () => openCognitiveLabs("stroop");
     DOM.btnOpenLabs?.addEventListener("click", openLabsHandler);
@@ -2643,7 +2659,8 @@
         { key: "flashcards", label: `Study Cards (${mod.flashcards.length})`, icon: "layers" },
         { key: "quiz", label: `Practice Quiz (${mod.quiz.length})`, icon: "check" },
         { key: "case-study", label: `Case Study (1)`, icon: "puzzle" },
-        { key: "resources", label: "Curated Media", icon: "video" }
+        { key: "resources", label: "Curated Media", icon: "video" },
+        { key: "deeptutor", label: "DeepTutor AI", icon: "robot" }
       ];
 
       DOM.moduleTabs.innerHTML = "";
@@ -2665,6 +2682,8 @@
           iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
         } else if (t.key === "case-study") {
           iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>`;
+        } else if (t.key === "deeptutor") {
+          iconSvg = `<span class="text-sm">🤖</span>`;
         } else {
           iconSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
         }
@@ -2694,6 +2713,15 @@
       renderCaseStudyView(mod);
     } else if (state.currentTab === "resources") {
       renderResourcesView(mod);
+    } else if (state.currentTab === "deeptutor") {
+      renderDeepTutorTabView(mod);
+    }
+  }
+
+  function renderDeepTutorTabView(mod) {
+    if (!DOM.tabContent) return;
+    if (typeof DeepTutor !== "undefined" && DeepTutor.renderWorkspace) {
+      DeepTutor.renderWorkspace(DOM.tabContent, mod.id);
     }
   }
 
@@ -2804,12 +2832,31 @@
         ${analogyHtml}
         ${critiqueHtml}
         ${keyPointsHtml}
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+          <span class="text-[11px] text-slate-400">Socratic Active Recall</span>
+          <button type="button" data-dt-ask-sec="${sec.title}" class="px-3 py-1.5 rounded-xl bg-violet-50 dark:bg-violet-950/50 hover:bg-violet-100 dark:hover:bg-violet-900/60 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800/80 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer">
+            <span>🤖</span>
+            <span>Ask DeepTutor About This</span>
+          </button>
+        </div>
       `;
 
       container.appendChild(secCard);
 
       secCard.querySelector(`[data-tts-sec="${sec.id}"]`)?.addEventListener("click", function () {
         speakText(`${sec.title}. ${sec.content}`, this);
+      });
+
+      secCard.querySelector(`[data-dt-ask-sec]`)?.addEventListener("click", function () {
+        switchTab("deeptutor");
+        setTimeout(() => {
+          const chatInput = document.getElementById("dt-chat-input");
+          const chatForm = document.getElementById("dt-chat-form");
+          if (chatInput && chatForm) {
+            chatInput.value = `Explain "${sec.title}" using a vivid analogy and an active-recall reflection question.`;
+            chatForm.dispatchEvent(new Event("submit"));
+          }
+        }, 150);
       });
     });
 

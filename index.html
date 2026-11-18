@@ -122,6 +122,10 @@
 
       <!-- Quick Interactive Hubs -->
       <div class="px-3 py-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
+        <button id="sidebar-btn-deeptutor" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-slate-800 hover:text-violet-600 dark:hover:text-violet-400 flex items-center gap-2.5 transition-colors cursor-pointer">
+          <span class="text-base">🤖</span>
+          <span>DeepTutor Socratic AI</span>
+        </button>
         <button id="sidebar-btn-labs" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-2.5 transition-colors">
           <span class="text-base">🧪</span>
           <span>Cognitive Labs & Brain Map</span>
@@ -182,6 +186,9 @@
         <!-- Injected via JS -->
       </div>
       <div class="p-3 border-t border-slate-100 dark:border-slate-800 space-y-1">
+        <button id="mobile-btn-deeptutor" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors cursor-pointer">
+          <span>🤖</span><span>DeepTutor Socratic AI</span>
+        </button>
         <button id="mobile-btn-guide" class="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors">
           <span>🧭</span><span>Scientific Learning Roadmap</span>
         </button>
@@ -240,6 +247,12 @@
           <button id="btn-streak-badge" title="Daily Study Streak & Badges" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all shadow-xs cursor-pointer">
             <span class="animate-bounce">🔥</span>
             <span id="streak-counter">1 Day Streak</span>
+          </button>
+
+          <!-- DeepTutor Socratic AI Button -->
+          <button id="btn-open-deeptutor" title="DeepTutor Socratic AI Workspace" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800/80 hover:bg-violet-100 dark:hover:bg-violet-900/60 transition-colors cursor-pointer">
+            <span>🤖</span>
+            <span class="hidden sm:inline">DeepTutor</span>
           </button>
 
           <!-- Cognitive Labs Button -->
@@ -632,6 +645,7 @@
 
   <!-- Scripts -->
   <script src="data.js"></script>
+  <script src="deeptutor.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

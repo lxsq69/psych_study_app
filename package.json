@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "mkdir -p www && cp index.html styles.css app.js data.js icon.png www/",
+    "build": "mkdir -p www && cp index.html styles.css app.js data.js deeptutor.js icon.png www/",
     "sync": "npm run build && npx cap sync",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

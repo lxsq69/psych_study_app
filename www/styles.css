@@ -287,4 +287,30 @@ html.dark .tile-matched {
   animation: stepPulse 2s infinite ease-in-out;
 }
 
+/* DeepTutor AI Styling & Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.dt-msg-content p {
+  margin-bottom: 0.5rem;
+}
+.dt-msg-content p:last-child {
+  margin-bottom: 0;
+}
+.dt-msg-content ul, .dt-msg-content ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+.dt-msg-content blockquote {
+  background: rgba(139, 92, 246, 0.05);
+  border-left-color: #8b5cf6;
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+}
+
 
